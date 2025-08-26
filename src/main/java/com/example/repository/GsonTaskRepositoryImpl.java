@@ -16,10 +16,16 @@ import com.google.gson.reflect.TypeToken;
 
 public class GsonTaskRepositoryImpl implements TaskRepository {
 
+	public GsonTaskRepositoryImpl() {
+		this.idGenerator = new IdGenerator(getMaxId());
+		this.gson = new Gson();
+	}
+
+	private final IdGenerator idGenerator;
+	private final Gson gson;
 	private static final String filePath = Paths.get("data", "WriterRepo.json").toString();
 	private static final Type listTypeToken = new TypeToken<List<Writer>>() {
 	}.getType();
-	private final Gson gson = new Gson();
 
 	@Override
 	public Task getById(Long id) {
@@ -40,6 +46,10 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 	public Task save(Task entity) {
 		try {
 			List<Task> tasks = readFromJson();
+			// generate uniq id for a new task
+			if (entity.getId() == 0L) {
+				entity.setId(getMaxId());
+			}
 			tasks.add(entity);
 			Files.write(Paths.get(filePath), gson.toJson(tasks, listTypeToken).getBytes());
 			return entity;
@@ -67,22 +77,26 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 	}
 
 	@Override
-	public void deleteById(Long id) {
+	public Task deleteById(Long id) {
 		try {
 			List<Task> tasks = readFromJson();
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getId() == id) {
-					tasks.remove(i);
+					Task task = tasks.remove(i);
 					Files.write(Paths.get(filePath), gson.toJson(tasks, listTypeToken).getBytes());
+					return task;
 				}
 			}
+			return null;
 		} catch (IOException e) {
-			e.printStackTrace();
+			return null;
 		}
 	}
 
 	private List<Task> readFromJson() {
 		List<Task> tasks;
+
+		// checking existence of the json data file
 		if (!Files.exists(Paths.get(filePath))) {
 			try {
 				Files.createFile(Paths.get(filePath));
@@ -92,16 +106,26 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 			tasks = new ArrayList<>();
 		}
 
+		// reading tasks from data file
 		try (Reader reader = new FileReader(filePath)) {
 			tasks = gson.fromJson(reader, listTypeToken);
 		} catch (IOException e) {
 			tasks = new ArrayList<>();
 		}
 
+		// checking for null
 		if (tasks == null) {
 			return tasks = new ArrayList<>();
 		}
 		return tasks;
+	}
+
+	private long getMaxId() {
+		List<Task> tasks = readFromJson();
+		if (tasks.size() > 0) {
+			return tasks.get(tasks.size() - 1).getId();
+		}
+		return 0;
 	}
 
 }
