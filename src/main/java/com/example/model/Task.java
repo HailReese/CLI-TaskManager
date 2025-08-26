@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Task {
 
-	public Task(String title, String description, int id) {
+	public Task(long id, String title, String description) {
 		this.id = id;
 		this.title = title;
 		this.description = description;
@@ -12,14 +12,14 @@ public class Task {
 		this.createdDateTime = LocalDateTime.now();
 	}
 
-	private final int id;
+	private final long id;
 	private String title;
 	private String description;
 	private Status status;
 	private LocalDateTime createdDateTime;
 	private LocalDateTime updatedDateTime;
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
