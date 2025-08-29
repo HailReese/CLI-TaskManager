@@ -41,20 +41,15 @@ public class TaskController {
 		return taskRepo.getById(id);
 	}
 
-	public Task updateById(Long id, String title, String description) {
+	public Task updateById(Long id, String title, String description, Status status) {
 		Task entity = readById(id);
 		if (entity != null) {
-			entity.setTitle(title);
-			entity.setDescription(description);
-			return taskRepo.update(entity);
-		}
-		return null;
-	}
-
-	public Task updateById(Long id, Status status) {
-		Task entity = readById(id);
-		if (entity != null) {
-			entity.setStatus(status);
+			if (title != null)
+				entity.setTitle(title);
+			if (description != null)
+				entity.setDescription(description);
+			if (status != null)
+				entity.setStatus(status);
 			return taskRepo.update(entity);
 		}
 		return null;

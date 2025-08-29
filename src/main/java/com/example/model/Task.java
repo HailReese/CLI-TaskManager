@@ -70,4 +70,10 @@ public class Task {
 				"ID: %d | Title: %s | Status: %s | Created: %s | Updated: %s",
 				id, title, status, createdAt.format(FORMATTER), updatedAt.format(FORMATTER));
 	}
+
+	public String toStringFull() {
+		return String.format(
+				"ID: %d | Title: %s | Description: %s | Status: %s | Created: %s | Updated: %s",
+				id, title, description, status, createdAt.format(FORMATTER), updatedAt.format(FORMATTER));
+	}
 }
