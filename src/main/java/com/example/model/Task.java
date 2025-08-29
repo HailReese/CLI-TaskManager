@@ -1,22 +1,25 @@
 package com.example.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Task {
-
-	public Task(String title, String description) {
-		this.title = title;
-		this.description = description;
-		this.status = Status.TODO;
-		this.createdDateTime = LocalDateTime.now();
-	}
 
 	private long id;
 	private String title;
 	private String description;
 	private Status status;
-	private LocalDateTime createdDateTime;
-	private LocalDateTime updatedDateTime;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
+	public Task(String title, String description) {
+		this.title = title;
+		this.description = description;
+		this.status = Status.TODO;
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = createdAt;
+	}
 
 	public long getId() {
 		return this.id;
@@ -32,7 +35,7 @@ public class Task {
 
 	public void setTitle(String title) {
 		this.title = title;
-		this.updatedDateTime = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public String getDescription() {
@@ -41,7 +44,7 @@ public class Task {
 
 	public void setDescription(String description) {
 		this.description = description;
-		this.updatedDateTime = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public Status getStatus() {
@@ -50,14 +53,21 @@ public class Task {
 
 	public void setStatus(Status status) {
 		this.status = status;
-		this.updatedDateTime = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
 	}
 
-	public LocalDateTime getCreatedDateTime() {
-		return this.createdDateTime;
+	public LocalDateTime getCreatedAt() {
+		return this.createdAt;
 	}
 
-	public LocalDateTime getUpdatedDateTime() {
-		return this.updatedDateTime;
+	public LocalDateTime getUpdatedAt() {
+		return this.updatedAt;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"ID: %d | Title: %s | Status: %s | Created: %s | Updated: %s",
+				id, title, status, createdAt.format(FORMATTER), updatedAt.format(FORMATTER));
 	}
 }

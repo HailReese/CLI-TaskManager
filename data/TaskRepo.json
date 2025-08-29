@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Task 1",
+    "description": "some descr",
+    "status": "TODO",
+    "createdAt": "2025-08-28T18:17:50.497768",
+    "updatedAt": "2025-08-28T18:17:50.497768"
+  },
+  {
+    "id": 2,
+    "title": "Task 2",
+    "description": "some another descr",
+    "status": "TODO",
+    "createdAt": "2025-08-28T18:18:07.19127",
+    "updatedAt": "2025-08-28T18:18:07.19127"
+  },
+  {
+    "id": 3,
+    "title": "Task 3",
+    "description": "another some another descr",
+    "status": "TODO",
+    "createdAt": "2025-08-28T18:18:25.123749",
+    "updatedAt": "2025-08-28T18:18:25.123749"
+  }
+]

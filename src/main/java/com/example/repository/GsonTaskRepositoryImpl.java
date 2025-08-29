@@ -7,25 +7,38 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.example.model.Task;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
 public class GsonTaskRepositoryImpl implements TaskRepository {
 
-	public GsonTaskRepositoryImpl() {
-		this.idGenerator = new IdGenerator(getMaxId());
-		this.gson = new Gson();
-	}
-
-	private final IdGenerator idGenerator;
-	private final Gson gson;
-	private static final String filePath = Paths.get("data", "WriterRepo.json").toString();
-	private static final Type listTypeToken = new TypeToken<List<Writer>>() {
+	private final IdGenerator ID_GENERATOR;
+	private static final DateTimeFormatter ISO_DTF = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+	private static final Gson GSON = new GsonBuilder()
+			.registerTypeAdapter(LocalDateTime.class,
+					(JsonSerializer<LocalDateTime>) (src, type, ctx) -> new JsonPrimitive(src.format(ISO_DTF)))
+			.registerTypeAdapter(LocalDateTime.class,
+					(JsonDeserializer<LocalDateTime>) (json, type, ctx) -> LocalDateTime.parse(json.getAsString(),
+							ISO_DTF))
+			.setPrettyPrinting()
+			.create();
+	private static final String FILE_PATH = Paths.get("data", "TaskRepo.json").toString();
+	private static final Type LIST_TYPE_TOKEN = new TypeToken<List<Task>>() {
 	}.getType();
+
+	public GsonTaskRepositoryImpl() {
+		this.ID_GENERATOR = new IdGenerator(getMaxId());
+	}
 
 	@Override
 	public Task getById(Long id) {
@@ -34,7 +47,7 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 		return tasks.stream()
 				.filter(e -> e.getId() == id)
 				.findFirst()
-				.get();
+				.orElse(null);
 	}
 
 	@Override
@@ -48,10 +61,10 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 			List<Task> tasks = readFromJson();
 			// generate uniq id for a new task
 			if (entity.getId() == 0L) {
-				entity.setId(getMaxId());
+				entity.setId(ID_GENERATOR.nextId());
 			}
 			tasks.add(entity);
-			Files.write(Paths.get(filePath), gson.toJson(tasks, listTypeToken).getBytes());
+			Files.write(Paths.get(FILE_PATH), GSON.toJson(tasks, LIST_TYPE_TOKEN).getBytes());
 			return entity;
 		} catch (IOException e) {
 			return null;
@@ -66,7 +79,7 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getId() == entity.getId()) {
 					tasks.set(i, entity);
-					Files.write(Paths.get(filePath), gson.toJson(tasks, listTypeToken).getBytes());
+					Files.write(Paths.get(FILE_PATH), GSON.toJson(tasks, LIST_TYPE_TOKEN).getBytes());
 					return entity;
 				}
 			}
@@ -83,7 +96,7 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getId() == id) {
 					Task task = tasks.remove(i);
-					Files.write(Paths.get(filePath), gson.toJson(tasks, listTypeToken).getBytes());
+					Files.write(Paths.get(FILE_PATH), GSON.toJson(tasks, LIST_TYPE_TOKEN).getBytes());
 					return task;
 				}
 			}
@@ -97,9 +110,9 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 		List<Task> tasks;
 
 		// checking existence of the json data file
-		if (!Files.exists(Paths.get(filePath))) {
+		if (!Files.exists(Paths.get(FILE_PATH))) {
 			try {
-				Files.createFile(Paths.get(filePath));
+				Files.createFile(Paths.get(FILE_PATH));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -107,8 +120,8 @@ public class GsonTaskRepositoryImpl implements TaskRepository {
 		}
 
 		// reading tasks from data file
-		try (Reader reader = new FileReader(filePath)) {
-			tasks = gson.fromJson(reader, listTypeToken);
+		try (Reader reader = new FileReader(FILE_PATH)) {
+			tasks = GSON.fromJson(reader, LIST_TYPE_TOKEN);
 		} catch (IOException e) {
 			tasks = new ArrayList<>();
 		}

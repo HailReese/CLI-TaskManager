@@ -8,11 +8,11 @@ import com.example.repository.TaskRepository;
 
 public class TaskController {
 
+	private TaskRepository taskRepo;
+
 	public TaskController(TaskRepository taskRepo) {
 		this.taskRepo = taskRepo;
 	}
-
-	private TaskRepository taskRepo;
 
 	public Task create(String title, String description) {
 		return taskRepo.save(new Task(title, description));
@@ -22,11 +22,10 @@ public class TaskController {
 		return taskRepo.getAll();
 	}
 
-	public List<Task> readAll(int type) {
-
+	public List<Task> readAll(int num) {
 		Status status;
 
-		switch (type) {
+		switch (num) {
 			case 0 -> status = Status.TODO;
 			case 1 -> status = Status.IN_PROGRESS;
 			case 2 -> status = Status.DONE;
@@ -39,14 +38,26 @@ public class TaskController {
 	}
 
 	public Task readById(Long id) {
-		return taskRepo.getById(id));
+		return taskRepo.getById(id);
 	}
 
 	public Task updateById(Long id, String title, String description) {
 		Task entity = readById(id);
-		entity.setTitle(title);
-		entity.setDescription(description);
-		return taskRepo.update(entity);
+		if (entity != null) {
+			entity.setTitle(title);
+			entity.setDescription(description);
+			return taskRepo.update(entity);
+		}
+		return null;
+	}
+
+	public Task updateById(Long id, Status status) {
+		Task entity = readById(id);
+		if (entity != null) {
+			entity.setStatus(status);
+			return taskRepo.update(entity);
+		}
+		return null;
 	}
 
 	public Task delete(Long id) {
