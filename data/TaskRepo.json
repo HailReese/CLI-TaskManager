@@ -1,18 +1,2 @@
 [
-  {
-    "id": 7,
-    "title": "Task1",
-    "description": "",
-    "status": "TODO",
-    "createdAt": "2025-08-30T03:35:45.12384",
-    "updatedAt": "2025-08-30T03:35:45.12384"
-  },
-  {
-    "id": 8,
-    "title": "Task3",
-    "description": "",
-    "status": "TODO",
-    "createdAt": "2025-08-30T03:35:55.176617",
-    "updatedAt": "2025-08-30T03:35:55.176617"
-  }
 ]
